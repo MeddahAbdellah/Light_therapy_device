@@ -19,6 +19,7 @@ var app = {
     bleDevice_id:"notConnected",
     bleNecessity:true,
     session_initiated:false,
+    serialReg:"",
     // Application Constructor
     initialize: function() {
 
@@ -39,6 +40,7 @@ var app = {
         this.lastSendTime = new Date().getTime();
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
+        this.serialReg="";
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
 
@@ -310,13 +312,13 @@ var app = {
                // if we received a \n, the message is complete, display it
                if(view[i] === 13) {// check if the read rate correspond to the ESP serial print rate
                   var now = new Date();
-                  app.serialDataCallback(serialRead);
+                  app.serialDataCallback(app.serialReg);
                   lastRead = now;
-                  serialRead= '';
+                  app.serialReg= '';
                }// if not, concatenate with the begening of the message
                else {
                    var temp_str = String.fromCharCode(view[i]);
-                   serialRead+= temp_str;
+                   app.serialReg+= temp_str;
                }
            }
           }
