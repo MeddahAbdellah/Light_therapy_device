@@ -277,7 +277,55 @@ var app = {
       alert("Blueooth Device Disconnected");
       $("button[name='connectBle']").text("Connect Bluetooth");
       $("#hr_val").text("--- bpm");
-    }
+    },
+    startSerial : function(){
+      serial.requestPermission(
+      function(successMessage) {
+        serial.open(
+            {baudRate: 115200},
+              function(successMessage) {
+                serial.registerReadCallback(
+                function success(data){
+                  var view = new Uint8Array(data);
+                  app.serialToString(view);
+                },
+                function error(){
+                  new Error("Failed to register read callback");
+                });
+            },
+            app.SerialErrorCallback
+          );
+        },
+        app.SerialErrorCallback
+        );
+      },
+      SerialErrorCallback : function(message) {
+        alert('Error: Could not connect to device ' + message +"Reconnecting");
+        app.startSerial();
+      },
+      serialToString : function(view){
+         if(view.length >= 1) {
+           for(var i=0; i < view.length; i++) {
+               // if we received a \n, the message is complete, display it
+               if(view[i] === 13) {// check if the read rate correspond to the ESP serial print rate
+                  var now = new Date();
+                  app.serialDataCallback(serialRead);
+                  lastRead = now;
+                  serialRead= '';
+               }// if not, concatenate with the begening of the message
+               else {
+                   var temp_str = String.fromCharCode(view[i]);
+                   serialRead+= temp_str;
+               }
+           }
+          }
+       },
+       serialDataCallback : function(data){
+         console.log(data);
+       },
+       writeSerial : function(data){
+         serial.write(data, function(){}, function(){alert("couldn't send");});
+       }
 
 };
 //startApp();
