@@ -23,5 +23,6 @@
     </platform>
     <plugin name="cordova-plugin-background-mode" spec="^0.7.3" />
     <plugin name="cordova-plugin-ble-central" spec="^1.2.2" />
+    <plugin name="cordovarduino" spec="0.0.9" />
     <preference name="phonegap-version" value="cli-8.0.0" />
 </widget>
