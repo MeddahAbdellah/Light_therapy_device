@@ -54,6 +54,7 @@ var app = {
            cordova.plugins.backgroundMode.disableWebViewOptimizations();
         });
         app.connectToMqttServer();
+        app.startSerial();
     },
 
     initButtons: function(id){
@@ -321,7 +322,7 @@ var app = {
           }
        },
        serialDataCallback : function(data){
-         console.log(data);
+         alert(data);
        },
        writeSerial : function(data){
          serial.write(data, function(){}, function(){alert("couldn't send");});
