@@ -294,7 +294,7 @@ var app = {
       serial.requestPermission(
       function(successMessage) {
         serial.open(
-            {baudRate: 2000000},
+            {baudRate: 500000},
               function(successMessage) {
                 app.serialState=true;
                 serial.registerReadCallback(
