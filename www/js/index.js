@@ -65,7 +65,7 @@ var app = {
             testVar = testVar=="1"?"0":"1";
             app.writeSerial(testVar);
           }
-        },100);
+        },1000);
     },
 
     initButtons: function(id){
