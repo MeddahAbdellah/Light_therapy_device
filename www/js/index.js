@@ -334,7 +334,8 @@ var app = {
           }
        },
        serialDataCallback : function(data){
-         alert(data);
+        //alert(data);
+        console.log(data);
        },
        writeSerial : function(data){
          serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
