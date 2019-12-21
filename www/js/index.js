@@ -62,7 +62,7 @@ var app = {
         app.startSerial();
         setInterval(function(){
           if(app.serialState){
-            testVar = testVar=="1\n"?"0\n":"1\n";
+            testVar = testVar=="1*"?"0*":"1*";
             app.writeSerial(testVar);
           }
         },1000);
