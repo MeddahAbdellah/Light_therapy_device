@@ -296,6 +296,7 @@ var app = {
         serial.open(
             {baudRate: 115200},
               function(successMessage) {
+                app.serialState=true;
                 serial.registerReadCallback(
                 function success(data){
                   var view = new Uint8Array(data);
