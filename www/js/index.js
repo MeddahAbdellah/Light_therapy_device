@@ -1,4 +1,5 @@
 var mqttClient = null ;
+var testVar="0";
 document.addEventListener('deviceready', startApp, false);
 
 var app = {
@@ -20,6 +21,7 @@ var app = {
     bleNecessity:true,
     session_initiated:false,
     serialReg:"",
+    serialState:false,
     // Application Constructor
     initialize: function() {
 
@@ -41,6 +43,7 @@ var app = {
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
         this.serialReg="";
+        this.serialState=false;
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
 
@@ -57,6 +60,12 @@ var app = {
         });
         app.connectToMqttServer();
         app.startSerial();
+        setInterval(function(){
+          if(app.serialState){
+            testVar = testVar=="1"?"0":"1";
+            app.writeSerial(testVar);
+          }
+        },100)
     },
 
     initButtons: function(id){
@@ -327,7 +336,7 @@ var app = {
          alert(data);
        },
        writeSerial : function(data){
-         serial.write(data, function(){}, function(){alert("couldn't send");});
+         serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
        }
 
 };
