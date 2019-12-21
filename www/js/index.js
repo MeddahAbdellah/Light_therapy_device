@@ -43,7 +43,7 @@ var app = {
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
         this.serialReg="";
-        this.serialState=false;
+        this.serialState="1\n";
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
 
@@ -62,7 +62,7 @@ var app = {
         app.startSerial();
         setInterval(function(){
           if(app.serialState){
-            testVar = testVar=="1"?"0":"1";
+            testVar = testVar=="1\n"?"0\n":"1\n";
             app.writeSerial(testVar);
           }
         },1000);
