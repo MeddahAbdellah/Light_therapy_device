@@ -22,6 +22,7 @@ var app = {
     session_initiated:false,
     serialReg:"",
     serialState:false,
+    externalDeviceTopics:[],
     // Application Constructor
     initialize: function() {
 
@@ -43,7 +44,8 @@ var app = {
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
         this.serialReg="";
-        this.serialState="1\n";
+        this.serialState="1*";
+        this.externalDeviceTopics=[];
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
 
@@ -55,6 +57,7 @@ var app = {
     onDeviceReady: function() {
         app.loadView(1).then(app.initCssStates).then(app.initButtons);
         cordova.plugins.backgroundMode.enable();
+        window.plugins.insomnia.keepAwake()
         cordova.plugins.backgroundMode.on('activate', function() {
            cordova.plugins.backgroundMode.disableWebViewOptimizations();
         });
@@ -208,8 +211,10 @@ var app = {
         var device_id = app.device_id;
         var data = payload.toString().split(",");
         console.log(data);
+        if(externalDeviceTopics.includes(topic)){
+          writeSerial(topic+","+payload.toString());
+        }
         if(topic === "command"+device_id){
-
           if(data[0] == '1'){
             app.sendEnabled=true;
             app.session_id = data[1];
@@ -333,9 +338,17 @@ var app = {
            }
           }
        },
-       serialDataCallback : function(data){
-        //alert(data);
-        console.log(data);
+       serialDataCallback : function(rawData){
+        console.log(rawData);
+        //s/p,subject,data
+        var data = rawData.split(',');
+        if(data[0]=='s'){
+          mqttClient.subscribe(data[1]+app.device_id);
+          if(!externalDeviceTopics.includes(data[1]+app.device_id))externalDeviceTopics.append(data[1]+app.device_id);
+        }
+        else if(data[0]=='p'){
+          mqttClient.publish(data[1]+app.device_id,data[2]);
+        }
        },
        writeSerial : function(data){
          serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
