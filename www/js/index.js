@@ -341,7 +341,6 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         //s/p,subject,data
-        alert(rawData);
         var data = rawData.split(',');
         if(data[0]=='s'){
           mqttClient.subscribe(data[1]+app.device_id);
