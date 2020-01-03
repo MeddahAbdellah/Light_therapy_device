@@ -199,11 +199,13 @@ var app = {
       mqttClient.subscribe("status"+app.device_id);
       mqttClient.subscribe("ping"+app.device_id);
       mqttClient.on("connect",function(){
+        if(app.serialState)app.writeSerial("localSetup");
         app.mqttConnected = true;
         mqttClient.publish("status"+app.device_id,"a,1,"+(app.bleConnected? 1:0)+","+app.device_id);
         mqttClient.publish("ping"+app.device_id," ");
       });
       mqttClient.on("disconnect",function(){
+        if(app.serialState)app.writeSerial("localSetup");
         app.mqttConnected = false;
         mqttClient.publish("status"+app.device_id,"a,0,"+(app.bleConnected? 1:0)+","+app.device_id);
       });
