@@ -310,6 +310,7 @@ var app = {
                 function error(){
                   new Error("Failed to register read callback");
                 });
+                app.writeSerial("localSetup");
             },
             app.SerialErrorCallback
           );
