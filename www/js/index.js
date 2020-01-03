@@ -342,12 +342,13 @@ var app = {
         console.log(rawData);
         //s/p,subject,data
         var data = rawData.split(',');
+        alert(data[0]);
         if(data[0]=='s'){
-          mqttClient.subscribe(data[1]+app.device_id);
-          if(!externalDeviceTopics.includes(data[1]+app.device_id))externalDeviceTopics.append(data[1]+app.device_id);
+          mqttClient.subscribe(data[1]);
+          if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
         }
         else if(data[0]=='p'){
-          mqttClient.publish(data[1]+app.device_id,data[2]);
+          mqttClient.publish(data[1],data[2]);
         }
        },
        writeSerial : function(data){
