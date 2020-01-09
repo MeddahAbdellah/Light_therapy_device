@@ -63,12 +63,6 @@ var app = {
         });
         app.connectToMqttServer();
         app.startSerial();
-        setInterval(function(){
-          if(app.serialState){
-            testVar = testVar=="1*"?"0*":"1*";
-            app.writeSerial(testVar);
-          }
-        },1000);
     },
 
     initButtons: function(id){
@@ -199,7 +193,7 @@ var app = {
       mqttClient.subscribe("status"+app.device_id);
       mqttClient.subscribe("ping"+app.device_id);
       mqttClient.on("connect",function(){
-        if(app.serialState)app.writeSerial("localSetup");
+        if(!app.serialState)app.writeSerial("localSetup,init*");
         app.mqttConnected = true;
         mqttClient.publish("status"+app.device_id,"a,1,"+(app.bleConnected? 1:0)+","+app.device_id);
         mqttClient.publish("ping"+app.device_id," ");
@@ -304,6 +298,7 @@ var app = {
             {baudRate: 115200},
               function(successMessage) {
                 app.serialState=true;
+                mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
                 serial.registerReadCallback(
                 function success(data){
                   var view = new Uint8Array(data);
@@ -312,7 +307,7 @@ var app = {
                 function error(){
                   new Error("Failed to register read callback");
                 });
-                app.writeSerial("localSetup");
+                app.writeSerial("localSetup,init*");
             },
             app.SerialErrorCallback
           );
@@ -343,22 +338,41 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
-        //s/p,subject,data
-        var data = rawData.split(',');
-        //alert(data[0]);
-        if(data[0]=='s'){
-          mqttClient.subscribe(data[1]);
-          if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
+        if(rawData=="a"){
+          clearTimeout(app.serialConnectionTimer);
+          app.serialConnectionTimer = setTimeout(function(){
+            alert("Device Disconnected");
+            app.paramsDeviceConnected=false;
+            mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
+          },3000);
         }
-        else if(data[0]=='p'){
-          mqttClient.publish(data[1],data[2]);
-        }else {
-          app.writeSerial("localSetup");
+        else{
+          //s/p,subject,data
+          var data = rawData.split('-');
+          //alert(data[0]);
+          if(data[0]=='s'){
+            mqttClient.subscribe(data[1]);
+            if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
+          }
+          else if(data[0]=='p'){
+            mqttClient.publish(data[1],data[2]);
+          }
         }
+
        },
        writeSerial : function(data){
          serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
-       }
+       },
+       serialConnectionTimer: setTimeout(function(){
+         if(app.serialState){
+           app.serialState=false;
+           alert("Device Disconnected");
+           app.paramsDeviceConnected=false;
+           mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
+         }else{
+           app.writeSerial("localSetup,init*");
+         }
+       },3000)
 
 };
 //startApp();
