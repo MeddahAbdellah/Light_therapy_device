@@ -347,7 +347,8 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
-        $('.app').append(rawData+"<br>");
+        var testData = rawData.split("");
+        $('.app').append(rawData+" length: "+testData.length+"<br>");
         if(rawData=="a"){
           $(".app").append("Recieved a"+"<br>");
           app.paramsDeviceConnected=true;
