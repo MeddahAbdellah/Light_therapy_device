@@ -345,7 +345,7 @@ var app = {
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
         app.paramsDeviceConnected=true;
-        if(rawData=="a"){
+        if(rawData[0]=="a" && rawData.length==1){
           alert("reseting");
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer=null;
