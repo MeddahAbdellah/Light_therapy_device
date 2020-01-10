@@ -345,7 +345,6 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
-        $('.app').append("before: "+rawData+" length: "+rawData.length+"<br>");
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
         $('.app').append("after: "+rawData+" length: "+rawData.length+"<br><br>");
         if(rawData=="a"){
