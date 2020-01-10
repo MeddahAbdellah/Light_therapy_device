@@ -10,7 +10,7 @@ body {
     height:100vh;
     margin:0px;
     padding:0px;
-    text-transform:uppercase;
+  /*  text-transform:uppercase;*/
     width:100vw;
     font-family: 'Quicksand', sans-serif;
     background: #FBFCFC;
