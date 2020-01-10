@@ -44,8 +44,7 @@ var app = {
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
         this.serialReg="";
-        this.paramsDeviceConnected="1*";
-        this.externalDeviceTopics=[];
+        this.externalDeviceTopics=new Array();
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
 
@@ -212,7 +211,7 @@ var app = {
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
           $('.app').append("writingToESP: "+topic+","+payload.toString()+"<br>");
-          writeSerial(topic+","+payload.toString());
+          app.writeSerial(topic+","+payload.toString());
         }
         if(topic === "command"+device_id){
           if(data[0] == '1'){
