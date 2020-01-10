@@ -299,6 +299,16 @@ var app = {
               function(successMessage) {
                 app.paramsDeviceConnected=true;
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
+                app.serialConnectionTimer = setTimeout(function(){
+                  if(app.paramsDeviceConnected){
+                    app.paramsDeviceConnected=false;
+                    mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
+                    alert("Device Disconnected");
+                  }else{
+                    alert("Connection Attempt, please make sure the parameters device is connected");
+                    app.writeSerial("localSetup,init*");
+                  }
+                },3000)
                 serial.registerReadCallback(
                 function success(data){
                   var view = new Uint8Array(data);
@@ -342,10 +352,15 @@ var app = {
           app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
-            alert("Device Disconnected");
-            app.paramsDeviceConnected=false;
-            mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
-          },3000);
+            if(app.paramsDeviceConnected){
+              app.paramsDeviceConnected=false;
+              mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
+              alert("Device Disconnected");
+            }else{
+              alert("Connection Attempt, please make sure the parameters device is connected");
+              app.writeSerial("localSetup,init*");
+            }
+          },3000)
         }
         else{
           //s/p,subject,data
@@ -364,15 +379,7 @@ var app = {
        writeSerial : function(data){
          serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
        },
-       serialConnectionTimer: setTimeout(function(){
-         if(app.paramsDeviceConnected){
-           app.paramsDeviceConnected=false;
-           mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
-           alert("Device Disconnected");
-         }else{
-           app.writeSerial("localSetup,init*");
-         }
-       },3000)
+       serialConnectionTimer: NULL
 
 };
 //startApp();
