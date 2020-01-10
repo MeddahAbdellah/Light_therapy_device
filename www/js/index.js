@@ -207,6 +207,7 @@ var app = {
         var data = payload.toString().split(",");
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
+          $(".app").append("Writing to ESP: "topic+"-"+payload.toString()+"*<br>");
           app.writeSerial(topic+"-"+payload.toString()+"*");
         }
         if(topic === "command"+device_id){
@@ -297,6 +298,7 @@ var app = {
             {baudRate: 115200},
               function(successMessage) {
                 app.paramsDeviceConnected=true;
+                $(".app").html("");
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
                 app.serialConnectionTimer = setTimeout(function(){
                   if(app.paramsDeviceConnected){
@@ -344,6 +346,7 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
+        $(".app").append(rawData+"<br>");
         app.paramsDeviceConnected=true;
         if(rawData[0]=="a" && rawData.length==1){
           clearTimeout(app.serialConnectionTimer);
