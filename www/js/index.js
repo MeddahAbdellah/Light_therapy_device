@@ -210,7 +210,7 @@ var app = {
         var data = payload.toString().split(",");
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
-          $(".app").append("Writing to ESP: "topic+"-"+payload.toString()+"*<br>");
+          $(".app").append("Writing to ESP: "+topic+"-"+payload.toString()+"*<br>");
           app.writeSerial(topic+"-"+payload.toString()+"*");
         }
         if(topic === "command"+device_id){
