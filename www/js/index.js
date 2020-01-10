@@ -304,9 +304,7 @@ var app = {
                   if(app.paramsDeviceConnected){
                     app.paramsDeviceConnected=false;
                     mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
-                    alert("Device Disconnected");
                   }else{
-                    alert("Connection Attempt, please make sure the parameters device is connected");
                     app.writeSerial("localSetup,init*");
                   }
                 },3000)
@@ -349,17 +347,16 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
-        $('.app').append(rawData);
+        $('.app').append(rawData+"<br>");
         if(rawData=="a"){
+          $(".app").append("Recieved a"+"<br>");
           app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
             if(app.paramsDeviceConnected){
               app.paramsDeviceConnected=false;
               mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
-              alert("Device Disconnected");
             }else{
-              alert("Connection Attempt, please make sure the parameters device is connected");
               app.writeSerial("localSetup,init*");
             }
           },3000)
@@ -369,6 +366,7 @@ var app = {
           var data = rawData.split('-');
           //alert(data[0]);
           if(data[0]=='s'){
+            $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
             if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
           }
