@@ -308,7 +308,7 @@ var app = {
                   }else{
                     app.writeSerial("localSetup-init*");
                   }
-                },10000)
+                },4000)
                 serial.registerReadCallback(
                 function success(data){
                   var view = new Uint8Array(data);
@@ -358,7 +358,7 @@ var app = {
             }else{
               app.writeSerial("localSetup-init*");
             }
-          },10000)
+          },4000)
         }
         else{
           //s/p,subject,data
