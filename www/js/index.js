@@ -211,6 +211,7 @@ var app = {
         var data = payload.toString().split(",");
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
+          $('.app').append("writingToESP: "+topic+","+payload.toString()+"<br>");
           writeSerial(topic+","+payload.toString());
         }
         if(topic === "command"+device_id){
