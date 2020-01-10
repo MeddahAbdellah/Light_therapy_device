@@ -21,7 +21,7 @@ var app = {
     bleNecessity:true,
     session_initiated:false,
     serialReg:"",
-    serialState:false,
+    paramsDeviceConnected:false,
     externalDeviceTopics:[],
     // Application Constructor
     initialize: function() {
@@ -44,7 +44,7 @@ var app = {
         this.bleDevice_id = "notConnected";
         this.session_initiated=false;
         this.serialReg="";
-        this.serialState="1*";
+        this.paramsDeviceConnected="1*";
         this.externalDeviceTopics=[];
         if(localStorage.getItem('session_id') !== undefined)this.session_id=localStorage.getItem('session_id');
         else this.session_id="test";
@@ -193,13 +193,13 @@ var app = {
       mqttClient.subscribe("status"+app.device_id);
       mqttClient.subscribe("ping"+app.device_id);
       mqttClient.on("connect",function(){
-        if(!app.serialState)app.writeSerial("localSetup,init*");
+        if(!app.paramsDeviceConnected)app.writeSerial("localSetup,init*");
         app.mqttConnected = true;
         mqttClient.publish("status"+app.device_id,"a,1,"+(app.bleConnected? 1:0)+","+app.device_id);
         mqttClient.publish("ping"+app.device_id," ");
       });
       mqttClient.on("disconnect",function(){
-        if(app.serialState)app.writeSerial("localSetup");
+        if(app.paramsDeviceConnected)app.writeSerial("localSetup,init*");
         app.mqttConnected = false;
         mqttClient.publish("status"+app.device_id,"a,0,"+(app.bleConnected? 1:0)+","+app.device_id);
       });
@@ -297,7 +297,7 @@ var app = {
         serial.open(
             {baudRate: 115200},
               function(successMessage) {
-                app.serialState=true;
+                app.paramsDeviceConnected=true;
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
                 serial.registerReadCallback(
                 function success(data){
@@ -339,6 +339,7 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         if(rawData=="a"){
+          app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
             alert("Device Disconnected");
@@ -364,11 +365,10 @@ var app = {
          serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
        },
        serialConnectionTimer: setTimeout(function(){
-         if(app.serialState){
-           app.serialState=false;
-           alert("Device Disconnected");
+         if(app.paramsDeviceConnected){
            app.paramsDeviceConnected=false;
            mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
+           alert("Device Disconnected");
          }else{
            app.writeSerial("localSetup,init*");
          }
