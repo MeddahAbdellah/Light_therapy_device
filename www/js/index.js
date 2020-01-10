@@ -299,7 +299,7 @@ var app = {
               function(successMessage) {
                 app.paramsDeviceConnected=true;
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
-                app.html("");
+                $('.app').html("");
                 app.serialConnectionTimer = setTimeout(function(){
                   if(app.paramsDeviceConnected){
                     app.paramsDeviceConnected=false;
