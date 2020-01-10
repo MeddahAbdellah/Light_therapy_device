@@ -347,6 +347,7 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
+        rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
         var testData = rawData.split("");
         $('.app').append(rawData+" length: "+testData.length+"<br>");
         if(rawData=="a"){
@@ -365,7 +366,7 @@ var app = {
         else{
           //s/p,subject,data
           var data = rawData.split('-');
-          //alert(data[0]);
+          $(".app").append("data[0] = "+data[0]+" is: "+data[0]=='s'+"<br>");
           if(data[0]=='s'){
             $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
