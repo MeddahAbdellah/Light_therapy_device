@@ -210,7 +210,6 @@ var app = {
         var data = payload.toString().split(",");
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
-          $('.app').append("writingToESP: "+topic+"-"+payload.toString()+"<br>");
           app.writeSerial(topic+"-"+payload.toString()+"*");
         }
         if(topic === "command"+device_id){
@@ -302,7 +301,6 @@ var app = {
               function(successMessage) {
                 app.paramsDeviceConnected=true;
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
-                $('.app').html("");
                 app.serialConnectionTimer = setTimeout(function(){
                   if(app.paramsDeviceConnected){
                     app.paramsDeviceConnected=false;
@@ -349,9 +347,7 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
-        $('.app').append("after: "+rawData+" length: "+rawData.length+"<br><br>");
         if(rawData=="a"){
-        //  $(".app").append("Recieved a"+"<br>");
           app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
@@ -366,9 +362,7 @@ var app = {
         else{
           //s/p,subject,data
           var data = rawData.split('-');
-        //  $(".app").append("data[0] = "+data[0]+" is: "+data[0]=='s'+"<br>");
           if(data[0]=='s'){
-          //  $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
             if(!app.externalDeviceTopics.includes(data[1]))app.externalDeviceTopics.push(data[1]);
           }
