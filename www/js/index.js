@@ -345,7 +345,7 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
-        $(".app").append("rawData: "+rawData+" isReset:"+rawData[0]=="a"+" length:"+rawData.length);
+        $(".app").append("rawData: "+rawData+" isReset:"+rawData[0]=="a"+" length:"+rawData.length+"<br>");
         app.paramsDeviceConnected=true;
         if(rawData[0]=="a" && rawData.length==1){
           alert("reseting");
