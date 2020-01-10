@@ -22,7 +22,7 @@ var app = {
     session_initiated:false,
     serialReg:"",
     paramsDeviceConnected:false,
-    externalDeviceTopics:[],
+    externalDeviceTopics:new Array(),
     // Application Constructor
     initialize: function() {
 
@@ -368,7 +368,7 @@ var app = {
           if(data[0]=='s'){
           //  $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
-            if(!app.externalDeviceTopics.includes(data[1]))app.externalDeviceTopics.append(data[1]);
+            if(!app.externalDeviceTopics.includes(data[1]))app.externalDeviceTopics.push(data[1]);
           }
           else if(data[0]=='p'){
             mqttClient.publish(data[1],data[2]);
