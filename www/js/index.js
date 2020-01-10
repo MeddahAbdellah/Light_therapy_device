@@ -305,7 +305,7 @@ var app = {
                   }else{
                     app.writeSerial("localSetup-init*");
                   }
-                },3000)
+                },10000)
                 serial.registerReadCallback(
                 function success(data){
                   var view = new Uint8Array(data);
@@ -346,7 +346,9 @@ var app = {
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
         app.paramsDeviceConnected=true;
         if(rawData=="a"){
+          alert("reseting");
           clearTimeout(app.serialConnectionTimer);
+          app.serialConnectionTimer=null;
           app.serialConnectionTimer = setTimeout(function(){
             if(app.paramsDeviceConnected){
               app.paramsDeviceConnected=false;
@@ -354,7 +356,7 @@ var app = {
             }else{
               app.writeSerial("localSetup-init*");
             }
-          },3000)
+          },10000)
         }
         else{
           //s/p,subject,data
