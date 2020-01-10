@@ -207,7 +207,7 @@ var app = {
         var device_id = app.device_id;
         var data = payload.toString().split(",");
         console.log(data);
-        if(externalDeviceTopics.includes(topic)){
+        if(app.externalDeviceTopics.includes(topic)){
           writeSerial(topic+","+payload.toString());
         }
         if(topic === "command"+device_id){
@@ -333,9 +333,7 @@ var app = {
            for(var i=0; i < view.length; i++) {
                // if we received a \n, the message is complete, display it
                if(view[i] === 13) {// check if the read rate correspond to the ESP serial print rate
-                  var now = new Date();
                   app.serialDataCallback(app.serialReg);
-                  lastRead = now;
                   app.serialReg= '';
                }// if not, concatenate with the begening of the message
                else {
@@ -370,7 +368,7 @@ var app = {
           if(data[0]=='s'){
           //  $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
-            if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
+            if(!app.externalDeviceTopics.includes(data[1]))app.externalDeviceTopics.append(data[1]);
           }
           else if(data[0]=='p'){
             mqttClient.publish(data[1],data[2]);
