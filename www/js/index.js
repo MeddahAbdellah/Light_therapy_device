@@ -344,8 +344,8 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
+        app.paramsDeviceConnected=true;
         if(rawData=="a"){
-          app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
             if(app.paramsDeviceConnected){
