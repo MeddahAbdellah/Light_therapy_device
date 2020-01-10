@@ -348,6 +348,7 @@ var app = {
        },
        serialDataCallback : function(rawData){
         console.log(rawData);
+        $('.app').html(rawData);
         if(rawData=="a"){
           app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
