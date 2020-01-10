@@ -62,9 +62,6 @@ var app = {
         });
         app.connectToMqttServer();
         app.startSerial();
-        setTimeout(function(){
-          mqttClient.publish("commandCA8D9478C6","1,8D9478C6CA,1");
-        },20000);
     },
 
     initButtons: function(id){
