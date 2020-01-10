@@ -373,7 +373,7 @@ var app = {
 
        },
        writeSerial : function(data){
-         serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
+         if(app.paramsDeviceState)serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
        },
        serialConnectionTimer: null
 
