@@ -34,7 +34,7 @@ var app = {
         this.mode = 1;
         this.sendEnabled = false;
         if(localStorage.getItem("device_id") !== null && localStorage.getItem("device_id") !== undefined)this.device_id = localStorage.getItem("device_id");
-        else this.device_id = "A7D997B11F";//'mqttjs_' + Math.random().toString(16).substr(2, 8)
+        else this.device_id = "CA8D9478C6";//'mqttjs_' + Math.random().toString(16).substr(2, 8)
         this.view = 1;
         this.mqttConnected = false;
         this.bleConnected = false;
