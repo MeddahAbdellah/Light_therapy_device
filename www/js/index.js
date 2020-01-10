@@ -354,7 +354,7 @@ var app = {
             }else{
               app.writeSerial("localSetup-init*");
             }
-          },10000)
+          },3000)
         }
         else{
           //s/p,subject,data
