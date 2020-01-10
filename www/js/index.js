@@ -34,7 +34,7 @@ var app = {
         this.mode = 1;
         this.sendEnabled = false;
         if(localStorage.getItem("device_id") !== null && localStorage.getItem("device_id") !== undefined)this.device_id = localStorage.getItem("device_id");
-        else this.device_id = "A7D997B46F";//'mqttjs_' + Math.random().toString(16).substr(2, 8)
+        else this.device_id = "A7D997B11F";//'mqttjs_' + Math.random().toString(16).substr(2, 8)
         this.view = 1;
         this.mqttConnected = false;
         this.bleConnected = false;
@@ -345,7 +345,7 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
-        $(".app").append("rawData: "+rawData+" isReset:"+rawData[0]=="a"+" length:"+rawData.length+"<br>");
+        $(".app").append("rawData: "+rawData+" isReset:"+(rawData[0]=="a")+" length:"+rawData.length+"<br>");
         app.paramsDeviceConnected=true;
         if(rawData[0]=="a" && rawData.length==1){
           alert("reseting");
@@ -374,7 +374,7 @@ var app = {
 
        },
        writeSerial : function(data){
-         if(app.paramsDeviceState)serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
+         serial.write(data, function(){}, function(){alert("couldn't send");app.startSerial();});
        },
        serialConnectionTimer: null
 
