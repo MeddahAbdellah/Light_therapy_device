@@ -195,13 +195,13 @@ var app = {
       mqttClient.subscribe("status"+app.device_id);
       mqttClient.subscribe("ping"+app.device_id);
       mqttClient.on("connect",function(){
-        if(!app.paramsDeviceConnected)app.writeSerial("localSetup,init*");
+        if(!app.paramsDeviceConnected)app.writeSerial("localSetup-init*");
         app.mqttConnected = true;
         mqttClient.publish("status"+app.device_id,"a,1,"+(app.bleConnected? 1:0)+","+app.device_id);
         mqttClient.publish("ping"+app.device_id," ");
       });
       mqttClient.on("disconnect",function(){
-        if(app.paramsDeviceConnected)app.writeSerial("localSetup,init*");
+        if(app.paramsDeviceConnected)app.writeSerial("localSetup-init*");
         app.mqttConnected = false;
         mqttClient.publish("status"+app.device_id,"a,0,"+(app.bleConnected? 1:0)+","+app.device_id);
       });
@@ -211,7 +211,7 @@ var app = {
         console.log(data);
         if(app.externalDeviceTopics.includes(topic)){
           $('.app').append("writingToESP: "+topic+","+payload.toString()+"<br>");
-          app.writeSerial(topic+","+payload.toString());
+          app.writeSerial(topic+"-"+payload.toString());
         }
         if(topic === "command"+device_id){
           if(data[0] == '1'){
@@ -308,7 +308,7 @@ var app = {
                     app.paramsDeviceConnected=false;
                     mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
                   }else{
-                    app.writeSerial("localSetup,init*");
+                    app.writeSerial("localSetup-init*");
                   }
                 },3000)
                 serial.registerReadCallback(
@@ -319,7 +319,7 @@ var app = {
                 function error(){
                   new Error("Failed to register read callback");
                 });
-                app.writeSerial("localSetup,init*");
+                app.writeSerial("localSetup-init*");
             },
             app.SerialErrorCallback
           );
@@ -359,7 +359,7 @@ var app = {
               app.paramsDeviceConnected=false;
               mqttClient.publish("status"+app.device_id,"m,0"+","+app.device_id);
             }else{
-              app.writeSerial("localSetup,init*");
+              app.writeSerial("localSetup-init*");
             }
           },10000)
         }
