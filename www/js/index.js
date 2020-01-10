@@ -298,7 +298,6 @@ var app = {
               function(successMessage) {
                 app.paramsDeviceConnected=true;
                 mqttClient.publish("status"+app.device_id,"m,1"+","+app.device_id);
-                $(".app").html("");
                 app.serialConnectionTimer = setTimeout(function(){
                   if(app.paramsDeviceConnected){
                     app.paramsDeviceConnected=false;
@@ -345,10 +344,8 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
-        $(".app").append("rawData: "+rawData+" isReset:"+(rawData[0]=="a")+" length:"+rawData.length+"<br>");
         app.paramsDeviceConnected=true;
         if(rawData[0]=="a" && rawData.length==1){
-          alert("reseting");
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer=null;
           app.serialConnectionTimer = setTimeout(function(){
