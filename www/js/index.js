@@ -348,10 +348,9 @@ var app = {
        serialDataCallback : function(rawData){
         console.log(rawData);
         rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
-        var testData = rawData.split("");
-        $('.app').append(rawData+" length: "+testData.length+"<br>");
+        $('.app').append(rawData+" length: "+rawData.length+"<br>");
         if(rawData=="a"){
-          $(".app").append("Recieved a"+"<br>");
+        //  $(".app").append("Recieved a"+"<br>");
           app.paramsDeviceConnected=true;
           clearTimeout(app.serialConnectionTimer);
           app.serialConnectionTimer = setTimeout(function(){
@@ -366,9 +365,9 @@ var app = {
         else{
           //s/p,subject,data
           var data = rawData.split('-');
-          $(".app").append("data[0] = "+data[0]+" is: "+data[0]=='s'+"<br>");
+        //  $(".app").append("data[0] = "+data[0]+" is: "+data[0]=='s'+"<br>");
           if(data[0]=='s'){
-            $(".app").append("Subscription: "+data[1]+"<br>");
+          //  $(".app").append("Subscription: "+data[1]+"<br>");
             mqttClient.subscribe(data[1]);
             if(!externalDeviceTopics.includes(data[1]))externalDeviceTopics.append(data[1]);
           }
