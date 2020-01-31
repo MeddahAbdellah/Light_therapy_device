@@ -10,7 +10,7 @@ var app = {
   start_timeout: 10,
   mode: 1,
   sendEnabled: false,
-  device_id: "A7D997B46F",
+  device_id: "CA8D9478C6",
   view: 1,
   mqttConnected: false,
   bleConnected: false,
