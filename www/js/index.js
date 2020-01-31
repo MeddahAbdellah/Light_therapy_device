@@ -111,7 +111,6 @@ var app = {
   },
   loadSettingsPanel: function() {
     $(".settings").css("display", "flex");
-    console.log(app);
     $(".settings").html('<div class="settings_form"><h3>Settings</h3><div class="state"> <h6>Device ID </h6> <input type="text" name="device_id" value="' + app.device_id + '"></div><div class="state"> <h6>Parameters Device </h6> <div class="' + (app.paramsDeviceConnected ? "connected" : "notConnected") + '"></div></div><div class="state"> <h6>Bluetooth Connection </h6> <label class="container">Necessary<input name="bleNecessity" type="checkbox" ' + (app.bleNecessity ? 'checked="checked"' : '') + '><span class="checkmark"></span></label><div class="' + (app.bleConnected ? "connected" : "notConnected") + '"></div></div><div class="state"> <h6>MQTT Connection </h6> <div class="' + (app.mqttConnected ? "connected" : "notConnected") + '"></div></div></div>');
     $("input[name='device_id']").on("change", function() {
       localStorage.setItem("device_id", $("input[name='device_id']").val());
@@ -309,6 +308,7 @@ var app = {
         mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
+        alert(window.navigator.onLine);
         if(window.navigator.onLine)mqttClient.publish(data[1], data[2]);
         else app.handleMQTTCallback(data[1],data[2]);
       }
@@ -329,8 +329,6 @@ var app = {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
     console.log(data);
-    alert(topic);
-    alert(payload);
     if (app.externalDeviceTopics.includes(topic) && window.navigator.onLine) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
     }
@@ -368,7 +366,6 @@ var app = {
       app.normal_intensity = parseFloat(data[1]) / 10;
       app.low_intensity = parseFloat(data[2]) / 10;
       app.start_timeout = data[3];
-      console.log(app);
     } else if (topic === "status" + device_id) {
       if (data[0] == 'm') {
         app.paramsDeviceConnected = parseInt(data[1]) == 1 ? true : false;
