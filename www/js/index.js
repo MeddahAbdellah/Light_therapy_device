@@ -331,6 +331,8 @@ var app = {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
     console.log(data);
+    alert(topic);
+    alert(payload);
     if (app.externalDeviceTopics.includes(topic) && window.navigator.onLine) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
     }
