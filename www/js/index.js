@@ -63,7 +63,7 @@ var app = {
     app.connectToMqttServer();
     app.startSerial();
     setTimeout(function() {
-      mqttClient.publish("init" + app.device_id, "1,");
+      app.writeToESP("init" + app.device_id, "1,");
     }, 20000)
   },
 
@@ -78,10 +78,10 @@ var app = {
         if (!app.sendEnabled) {
           if ((app.bleConnected || !app.bleNecessity) && app.mqttConnected && app.paramsDeviceConnected) {
             if (!app.session_initiated) {
-              mqttClient.publish("init" + app.device_id, app.mode + ",");
+              app.writeToESP("init" + app.device_id, app.mode + ",");
               app.session_initiated = true;
             } else {
-              mqttClient.publish("command" + app.device_id, "0,");
+              app.writeToESP("command" + app.device_id, "0,");
             }
             //  console.log(app.pad(parseInt(app.start_timeout / 60),2)+":"+app.pad(app.start_timeout % 60,2));
             //  $("#timer").text(app.pad(parseInt((parseInt(app.start_timeout)+1) / 60),2)+":"+app.pad((parseInt(app.start_timeout)+1) % 60,2));
@@ -90,7 +90,7 @@ var app = {
             $(".icon-settings").click();
           }
         } else {
-          if (app.mqttConnected) mqttClient.publish("command" + app.device_id, "0,");
+          if (app.mqttConnected) app.writeToESP("command" + app.device_id, "0,");
           else alert("Could not Stop The Session Due To Poor Internet Connextion, Please Stop it Manually.");
         }
       }, 400);
@@ -176,14 +176,6 @@ var app = {
     ble.stopScan(function() {}, function() {});
     if (app.bleDevice_id != "notConnected" || app.bleConnected) ble.disconnect(app.bleDevice_id, app.bleDisconnected, function() {});
     startBLE($("button[name='connectBle']"));
-    /*setInterval(function(){
-      if(app.sendEnabled) {
-        console.log("publishing");
-        console.log(app.lastSendTime);
-        mqttClient.publish("data"+app.device_id,(500+parseInt(Math.random()*300)).toString()+","+parseInt(parseInt(new Date().getTime())-app.lastSendTime).toString()+","+app.session_id);
-        app.lastSendTime = new Date().getTime();
-      }
-    },1000);*/
   },
 
   connectToMqttServer: function() {
@@ -198,61 +190,17 @@ var app = {
     mqttClient.on("connect", function() {
       if (!app.paramsDeviceConnected) app.writeSerial("localSetup-init*");
       app.mqttConnected = true;
-      mqttClient.publish("status" + app.device_id, "a,1," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
-      mqttClient.publish("ping" + app.device_id, " ");
+      app.writeToESP("status" + app.device_id, "a,1," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
+      app.writeToESP("ping" + app.device_id, " ");
     });
     mqttClient.on("disconnect", function() {
       if (app.paramsDeviceConnected) app.writeSerial("localSetup-init*");
       app.mqttConnected = false;
-      mqttClient.publish("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
+      app.writeToESP("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
     });
-    mqttClient.on("message", function(topic, payload) {
-      var device_id = app.device_id;
-      var data = payload.toString().split(",");
-      console.log(data);
-      if (app.externalDeviceTopics.includes(topic)) {
-        app.writeSerial(topic + "-" + payload.toString() + "*");
-      }
-      if (topic === "command" + device_id) {
-        if (data[0] == '1') {
-          app.sendEnabled = true;
-          app.session_id = data[1];
-          app.loadView(3).then(app.initCssStates).then(app.initButtons);
-          localStorage.setItem("session_id", data[1]);
-          $("#session_id").text("SESSION ID: " + data[1]);
-          app.mode = parseInt(data[2]);
-          app.lastSendTime = new Date().getTime();
-          app.timeoutCallback = function() {
-            $("button[name='start_stop']").click();
-          }
-          var minutes = parseInt(parseInt(data[3]) / 60);
-          var seconds = parseInt(data[3]) % 60;
-          $("#timer").text(app.pad(minutes, 2) + ":" + app.pad(seconds, 2));
-        } else if (data[0] == '0') {
-          app.sendEnabled = false;
-          setTimeout(function() {
-            if (app.bleConnected && !app.sendEnabled) ble.disconnect(app.bleDevice_id, app.bleDisconnected, function() {});
-          }, 60000);
-          app.session_initiated = false;
-          app.loadView(1).then(app.initCssStates).then(app.initButtons);
-          $("#timer").text("00:00");
-        }
-      } else if (topic === "settings" + device_id) {
-        app.high_intensity = parseFloat(data[0]) / 10;
-        app.normal_intensity = parseFloat(data[1]) / 10;
-        app.low_intensity = parseFloat(data[2]) / 10;
-        app.start_timeout = data[3];
-        console.log(app);
-      } else if (topic === "status" + device_id) {
-        if (data[0] == 'm') {
-          app.paramsDeviceConnected = parseInt(data[1]) == 1 ? true : false;
-        }
-      } else if (topic === "ping" + device_id) {
-        console.log("PINGED");
-        mqttClient.publish("status" + app.device_id, "a," + (app.mqttConnected ? 1 : 0) + "," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
-      }
-    });
-    mqttClient.publish("getSettings", "s," + app.device_id);
+    mqttClient.on("message", handleMQTTCallback);
+    if(window.navigator.onLine)mqttClient.publish("getSettings", "s," + app.device_id);
+    else app.writeToESP("settings"+app.device_id+"-"+app.high_intensity+","+app.normal_intensity+","+app.low_intensity+","+app.start_timeout+"*");
   },
   timer: setInterval(function() {
     var time = $("#timer").text().toString().split(':');
@@ -270,7 +218,7 @@ var app = {
       })
     } else if (timestamp <= 0) {
       $("#timer").text("00:00");
-      mqttClient.publish("command" + app.device_id, "0,");
+      app.writeToESP("command" + app.device_id, "0,");
     }
 
   }, 1000),
@@ -297,11 +245,11 @@ var app = {
           },
           function(successMessage) {
             app.paramsDeviceConnected = true;
-            mqttClient.publish("status" + app.device_id, "m,1" + "," + app.device_id);
+            app.writeToESP("status" + app.device_id, "m,1" + "," + app.device_id);
             app.serialConnectionTimer = setTimeout(function() {
               if (app.paramsDeviceConnected) {
                 app.paramsDeviceConnected = false;
-                mqttClient.publish("status" + app.device_id, "m,0" + "," + app.device_id);
+                app.writeToESP("status" + app.device_id, "m,0" + "," + app.device_id);
               } else {
                 app.writeSerial("localSetup-init*");
               }
@@ -351,7 +299,7 @@ var app = {
       app.serialConnectionTimer = setTimeout(function() {
         if (app.paramsDeviceConnected) {
           app.paramsDeviceConnected = false;
-          mqttClient.publish("status" + app.device_id, "m,0" + "," + app.device_id);
+          app.writeToESP("status" + app.device_id, "m,0" + "," + app.device_id);
         } else {
           app.writeSerial("localSetup-init*");
         }
@@ -363,7 +311,8 @@ var app = {
         mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
-        mqttClient.publish(data[1], data[2]);
+        if(window.navigator.onLine)app.writeToESP(data[1], data[2]);
+        else app.handleMQTTCallback(data[1],data[2]);
       }
     }
 
@@ -374,7 +323,70 @@ var app = {
       app.startSerial();
     });
   },
-  serialConnectionTimer: null
+  writeToESP:function(topic,data){
+    if(window.navigator.onLine) mqttClient.publish(topic, data);
+    else app.writeSerial(topic + "-" + data + "*");
+  },
+  handleMQTTCallback:function(topic, payload) {
+    var device_id = app.device_id;
+    var data = payload.toString().split(",");
+    console.log(data);
+    if (app.externalDeviceTopics.includes(topic) && window.navigator.onLine) {
+      app.writeSerial(topic + "-" + payload.toString() + "*");
+    }
+    if (topic === "newSession" + device_id) {
+      let id = sha256(data[1] + new Date().getTime()).toString().substring(0, 10).toUpperCase();
+      app.writeToESP("command"+device_id,"1,"+id+","+data[2]+","+data[3]);
+    }
+    if (topic === "command" + device_id) {
+      if (data[0] == '1') {
+        app.sendEnabled = true;
+        app.session_id = data[1];
+        app.loadView(3).then(app.initCssStates).then(app.initButtons);
+        localStorage.setItem("session_id", data[1]);
+        $("#session_id").text("SESSION ID: " + data[1]);
+        app.mode = parseInt(data[2]);
+        app.lastSendTime = new Date().getTime();
+        app.timeoutCallback = function() {
+          $("button[name='start_stop']").click();
+        }
+        var minutes = parseInt(parseInt(data[3]) / 60);
+        var seconds = parseInt(data[3]) % 60;
+        $("#timer").text(app.pad(minutes, 2) + ":" + app.pad(seconds, 2));
+      } else if (data[0] == '0') {
+        app.sendEnabled = false;
+        setTimeout(function() {
+          if (app.bleConnected && !app.sendEnabled) ble.disconnect(app.bleDevice_id, app.bleDisconnected, function() {});
+        }, 60000);
+        app.session_initiated = false;
+        app.loadView(1).then(app.initCssStates).then(app.initButtons);
+        $("#timer").text("00:00");
+      }
+    } else if (topic === "settings" + device_id) {
+      app.high_intensity = parseFloat(data[0]) / 10;
+      app.normal_intensity = parseFloat(data[1]) / 10;
+      app.low_intensity = parseFloat(data[2]) / 10;
+      app.start_timeout = data[3];
+      console.log(app);
+    } else if (topic === "status" + device_id) {
+      if (data[0] == 'm') {
+        app.paramsDeviceConnected = parseInt(data[1]) == 1 ? true : false;
+      }
+    } else if (topic === "ping" + device_id) {
+      console.log("PINGED");
+      app.writeToESP("status" + app.device_id, "a," + (app.mqttConnected ? 1 : 0) + "," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
+    } else if (topic.includes("data") && data.length>4){
+        //SAVE PARAMS DATA LOCALLY
+        app.saveData("paramData",data);
+    }
+  },
+  serialConnectionTimer: null,
+  saveData:function(name,data){
+
+  },
+  publishData:function(){
+
+  }
 
 };
 //startApp();
