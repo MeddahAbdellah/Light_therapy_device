@@ -337,6 +337,7 @@ var app = {
     if (topic === "newSession" + device_id) {
       let id = sha256(data[1] + new Date().getTime()).toString().substring(0, 10).toUpperCase();
       app.writeToESP("command"+device_id,"1,"+id+","+data[2]+","+data[3]);
+      app.handleMQTTCallback("command"+device_id,"1,"+id+","+data[2]+","+data[3]);
     }
     if (topic === "command" + device_id) {
       if (data[0] == '1') {
