@@ -56,7 +56,7 @@ function startBLE(button) {
               var load = rrValue + "," + timeDiff + "," + app.session_id + "," + hrValue;
               console.log("MQTT sending");
               console.log(load);
-              if(window.navigator.onLine)mqttClient.publish("data" + app.device_id, load);
+              if(networkState != Connection.NONE && networkState != Connection.UNKNOWN)mqttClient.publish("data" + app.device_id, load);
               else app.saveData("hrmData",load);
               lastReadingTime = new Date().getTime();
             }

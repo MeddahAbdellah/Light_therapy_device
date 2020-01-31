@@ -25,5 +25,6 @@
     <plugin name="cordova-plugin-ble-central" spec="^1.2.2" />
     <plugin name="cordova-plugin-insomnia" />
     <plugin name="cordovarduino" src="https://github.com/xseignard/cordovarduino.git" />
+    <plugin name="cordova-plugin-network-information" src="https://github.com/apache/cordova-plugin-network-information.git" />
     <preference name="phonegap-version" value="cli-8.0.0" />
 </widget>
