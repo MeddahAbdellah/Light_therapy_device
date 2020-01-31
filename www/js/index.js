@@ -324,8 +324,8 @@ var app = {
     });
   },
   writeToESP:function(topic,data){
-    if(window.navigator.onLine) mqttClient.publish(topic, data);
-    else app.writeSerial(topic + "-" + data + "*");
+    /*f(window.navigator.onLine) mqttClient.publish(topic, data);
+    else*/ app.writeSerial(topic + "-" + data + "*");
   },
   handleMQTTCallback:function(topic, payload) {
     var device_id = app.device_id;
