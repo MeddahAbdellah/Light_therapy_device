@@ -62,9 +62,7 @@ var app = {
     });
     app.connectToMqttServer();
     app.startSerial();
-    setTimeout(function() {
-      app.writeToESP("init" + app.device_id, "1,");
-    }, 20000)
+
   },
 
   initButtons: function(id) {
@@ -194,7 +192,7 @@ var app = {
       app.writeToESP("ping" + app.device_id, " ");
     });
     mqttClient.on("disconnect", function() {
-      if (app.paramsDeviceConnected) app.writeSerial("localSetup-init*");
+      if (!app.paramsDeviceConnected) app.writeSerial("localSetup-init*");
       app.mqttConnected = false;
       app.writeToESP("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
     });
@@ -311,7 +309,7 @@ var app = {
         mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
-        if(window.navigator.onLine)app.writeToESP(data[1], data[2]);
+        if(window.navigator.onLine)mqttClient.publish(data[1], data[2]);
         else app.handleMQTTCallback(data[1],data[2]);
       }
     }
