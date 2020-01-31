@@ -196,7 +196,7 @@ var app = {
       app.mqttConnected = false;
       app.writeToESP("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
     });
-    mqttClient.on("message", handleMQTTCallback);
+    mqttClient.on("message", app.handleMQTTCallback);
     if(window.navigator.onLine)mqttClient.publish("getSettings", "s," + app.device_id);
     else app.writeToESP("settings"+app.device_id+"-"+app.high_intensity+","+app.normal_intensity+","+app.low_intensity+","+app.start_timeout+"*");
   },
