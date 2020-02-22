@@ -23,7 +23,7 @@ var app = {
   serialReg: "",
   paramsDeviceConnected: false,
   externalDeviceTopics: new Array(),
-  database:null,
+  database: null,
   // Application Constructor
   initialize: function() {
 
@@ -63,12 +63,14 @@ var app = {
       cordova.plugins.backgroundMode.disableWebViewOptimizations();
     });
     app.database = openDatabase('sten', '1.0', 'lightDeviceTherapy', 8 * 1024 * 1024);
-    app.database.transaction(function (tx) {
-       tx.executeSql('CREATE TABLE IF NOT EXISTS parameters ( param_id INTEGER PRIMARY KEY, param1 float, param2 float, param3 float, param4 float, param5 float, param6 float, param7 float, param8 float, param9 float, param10 float, param11 float, param12 float, param13 float, param14 float, param15 float, param16 float, param17 float, param18 float, param19 float, param20 float, insert_date DATETIME, session_id VARCHAR(255) NOT NULL, packet_id INTEGER )',[], function(tx,result){
-         tx.executeSql('SELECT * FROM parameters', [], function (tx, results) {
-           console.log(results);
-         }, null);
-       },function(tx,error){console.error(error);} );
+    app.database.transaction(function(tx) {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS parameters ( param_id INTEGER PRIMARY KEY, param1 float, param2 float, param3 float, param4 float, param5 float, param6 float, param7 float, param8 float, param9 float, param10 float, param11 float, param12 float, param13 float, param14 float, param15 float, param16 float, param17 float, param18 float, param19 float, param20 float, insert_date DATETIME, session_id VARCHAR(255) NOT NULL, packet_id INTEGER )', [], function(tx, result) {
+        tx.executeSql('SELECT * FROM parameters', [], function(tx, results) {
+          console.log(results);
+        }, null);
+      }, function(tx, error) {
+        console.error(error);
+      });
     });
 
     //app.connectToMqttServer();
@@ -204,8 +206,8 @@ var app = {
       app.writeToESP("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
     });
     mqttClient.on("message", app.handleMQTTCallback);
-    if(app.mqttConnected)mqttClient.publish("getSettings", "s," + app.device_id);
-    else app.writeToESP("settings"+app.device_id+"-"+app.high_intensity+","+app.normal_intensity+","+app.low_intensity+","+app.start_timeout+"*");
+    if (app.mqttConnected) mqttClient.publish("getSettings", "s," + app.device_id);
+    else app.writeToESP("settings" + app.device_id + "-" + app.high_intensity + "," + app.normal_intensity + "," + app.low_intensity + "," + app.start_timeout + "*");
   },
   timer: setInterval(function() {
     var time = $("#timer").text().toString().split(':');
@@ -312,11 +314,11 @@ var app = {
       //s/p,subject,data
       var data = rawData.split('-');
       if (data[0] == 's') {
-        if(app.mqttConnected)mqttClient.subscribe(data[1]);
+        if (app.mqttConnected) mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
-        if(app.mqttConnected)mqttClient.publish(data[1], data[2]);
-        else app.handleMQTTCallback(data[1],data[2]);
+        if (app.mqttConnected) mqttClient.publish(data[1], data[2]);
+        else app.handleMQTTCallback(data[1], data[2]);
       }
     }
 
@@ -327,12 +329,13 @@ var app = {
       app.startSerial();
     });
   },
-  writeToESP:function(topic,data){
+  writeToESP: function(topic, data) {
     //CLIP
     /*if(app.mqttConnected) mqttClient.publish(topic, data);
-    else*/ app.writeSerial(topic + "-" + data + "*");
+    else*/
+    app.writeSerial(topic + "-" + data + "*");
   },
-  handleMQTTCallback:function(topic, payload) {
+  handleMQTTCallback: function(topic, payload) {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
     if (app.externalDeviceTopics.includes(topic) && app.mqttConnected) {
@@ -340,8 +343,8 @@ var app = {
     }
     if (topic === "newSession" + device_id) {
       let id = sha256(data[1] + new Date().getTime()).toString().substring(0, 10).toUpperCase();
-      app.writeToESP("command"+device_id,"1,"+id+","+data[2]+","+data[3]);
-      app.handleMQTTCallback("command"+device_id,"1,"+id+","+data[2]+","+data[3]);
+      app.writeToESP("command" + device_id, "1," + id + "," + data[2] + "," + data[3]);
+      app.handleMQTTCallback("command" + device_id, "1," + id + "," + data[2] + "," + data[3]);
     }
     if (topic === "command" + device_id) {
       if (data[0] == '1') {
@@ -379,31 +382,49 @@ var app = {
     } else if (topic === "ping" + device_id) {
       console.log("PINGED");
       app.writeToESP("status" + app.device_id, "a," + (app.mqttConnected ? 1 : 0) + "," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
-    } else if (topic.includes("data") && data.length>4){
-        //SAVE PARAMS DATA LOCALLY
-        app.saveData("paramData",data);
+    } else if (topic.includes("data") && data.length > 4) {
+      //SAVE PARAMS DATA LOCALLY
+      app.saveData("paramData", data);
     }
   },
   serialConnectionTimer: null,
-  saveData:function(name,data){
-    if(name='paramData'){
+  saveData: function(name, data) {
+    if (name = 'paramData') {
       var sql = "";
-      if (!parseInt(data[1])) sql += "INSERT INTO parameters SET session_id=" + data[0] + ", packet_id=" + data[7] + ", insert_date='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
-      else sql += "UPDATE parameters SET ";
-      for (var i = 0; i < data.length - 3; i++) {
-        sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1) + "='" + data[2 + i] + "'";
-        if (i < data.length - 4) sql += ",";
+      if (!parseInt(data[1])){
+       sql += "INSERT INTO parameters VALUES (session_id, packet_id, insert_date,";// + data[0] + "=" + data[7] + "='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
+       for (var i = 0; i < data.length - 3; i++) {
+         sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1);
+         if (i < data.length - 4) sql += ",";
+         else sql += ")";
+       }
+       sql += " ("+data[0] + "," + data[7] + "," + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + ",";
+
+       for (var i = 0; i < data.length - 3; i++) {
+         sql += data[2 + i] ;
+         if (i < data.length - 4) sql += ",";
+         else sql += ")";
+       }
       }
-      if (parseInt(data[1]) != 0) sql += " WHERE session_id=" + data[0] + " AND packet_id=" + data[7];
-      console.log("SQL QUERY : "+sql);
-      app.database.transaction(function (tx) {
-         tx.executeSql(sql, [], function (tx, results) {
-               console.log(results);
-             }, function(tx,error){console.error(error);} );
-          });
+      else {
+        sql += "UPDATE parameters SET ";
+        for (var i = 0; i < data.length - 3; i++) {
+          sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1) + "='" + data[2 + i] + "'";
+          if (i < data.length - 4) sql += ",";
+        }
+        sql += " WHERE session_id=" + data[0] + " AND packet_id=" + data[7];
+      }
+      console.log("SQL QUERY : " + sql);
+      app.database.transaction(function(tx) {
+        tx.executeSql(sql, [], function(tx, results) {
+          console.log(results);
+        }, function(tx, error) {
+          console.error(error);
+        });
+      });
     }
   },
-  publishData:function(){
+  publishData: function() {
 
   }
 
