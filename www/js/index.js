@@ -399,8 +399,7 @@ var app = {
       app.database.transaction(function (tx) {
          tx.executeSql(sql, [], function (tx, results) {
                console.log(results);
-             }, null);
-           },function(tx,error){console.error(error);} ););
+             }, function(tx,error){console.error(error);} );
           });
     }
   },
