@@ -397,8 +397,11 @@ var app = {
       if (parseInt(data[1]) != 0) sql += " WHERE session_id=" + data[0] + " AND packet_id=" + data[7];
       console.log("SQL QUERY : "+sql);
       app.database.transaction(function (tx) {
-         tx.executeSql(sql);
-      });
+         tx.executeSql(sql, [], function (tx, results) {
+               console.log(results);
+             }, null);
+           },function(tx,error){console.error(error);} ););
+          });
     }
   },
   publishData:function(){
