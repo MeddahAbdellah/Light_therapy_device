@@ -450,7 +450,7 @@ var app = {
       tx.executeSql('SELECT * FROM parameters', [], function(tx, results) {
         console.log(results);
         $.ajax({
-          url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertParams',
+          url:'http://ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertParams',
           type:'POST',
           data:JSON.stringify(results.rows),
           success:function(){
@@ -464,7 +464,7 @@ var app = {
       tx.executeSql('SELECT * FROM data', [], function(tx, results) {
         console.log(results);
         $.ajax({
-          url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertHrData',
+          url:'http://ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertHrData',
           type:'POST',
           data:JSON.stringify(results.rows),
           success:function(){
