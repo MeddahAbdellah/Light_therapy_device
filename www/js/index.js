@@ -64,8 +64,13 @@ var app = {
     });
     app.database = openDatabase('sten', '1.0', 'lightDeviceTherapy', 8 * 1024 * 1024);
     app.database.transaction(function (tx) {
-       tx.executeSql('CREATE TABLE parameters ( param_id INTEGER PRIMARY KEY, param1 float, param2 float, param3 float, param4 float, param5 float, param6 float, param7 float, param8 float, param9 float, param10 float, param11 float, param12 float, param13 float, param14 float, param15 float, param16 float, param17 float, param18 float, param19 float, param20 float, insert_date DATETIME, session_id VARCHAR(255) NOT NULL, packet_id INTEGER )',[], function(){},function(tx,error){console.error(error);} );
+       tx.executeSql('CREATE TABLE IF NOT EXISTS parameters ( param_id INTEGER PRIMARY KEY, param1 float, param2 float, param3 float, param4 float, param5 float, param6 float, param7 float, param8 float, param9 float, param10 float, param11 float, param12 float, param13 float, param14 float, param15 float, param16 float, param17 float, param18 float, param19 float, param20 float, insert_date DATETIME, session_id VARCHAR(255) NOT NULL, packet_id INTEGER )',[], function(tx,result){
+         tx.executeSql('SELECT * FROM parameters', [], function (tx, results) {
+           console.log(results);
+         }, null);
+       },function(tx,error){console.error(error);} );
     });
+
     //app.connectToMqttServer();
     app.startSerial();
   },
