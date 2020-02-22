@@ -328,7 +328,6 @@ var app = {
   handleMQTTCallback:function(topic, payload) {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
-    alert(payload);
     localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
     if (app.externalDeviceTopics.includes(topic) && app.mqttConnected) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
