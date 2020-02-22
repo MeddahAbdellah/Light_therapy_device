@@ -76,21 +76,19 @@ var app = {
         if (!app.sendEnabled) {
           if ((app.bleConnected || !app.bleNecessity) && app.paramsDeviceConnected) {
             if (!app.session_initiated) {
-              app.writeToESP("init" + app.device_id, app.mode + ",");//CLIP
+              app.writeToESP("init" + app.device_id, app.mode + ",");
               app.session_initiated = true;
             } else {
               app.writeToESP("command" + app.device_id, "0,");
-              ////STOP
+              app.handleMQTTCallback("command" + app.device_id, "0,");
             }
-            //  console.log(app.pad(parseInt(app.start_timeout / 60),2)+":"+app.pad(app.start_timeout % 60,2));
-            //  $("#timer").text(app.pad(parseInt((parseInt(app.start_timeout)+1) / 60),2)+":"+app.pad((parseInt(app.start_timeout)+1) % 60,2));
           } else {
             alert("All Devices Must Be Connected To Be Able To Start A New Session");
             $(".icon-settings").click();
           }
         } else {
-          if (app.mqttConnected) app.writeToESP("command" + app.device_id, "0,");
-          else alert("Could not Stop The Session Due To Poor Internet Connextion, Please Stop it Manually.");
+          app.writeToESP("command" + app.device_id, "0,");
+          app.handleMQTTCallback("command" + app.device_id, "0,");
         }
       }, 400);
     });
@@ -328,7 +326,6 @@ var app = {
   handleMQTTCallback:function(topic, payload) {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
-    localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
     if (app.externalDeviceTopics.includes(topic) && app.mqttConnected) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
     }
@@ -380,7 +377,7 @@ var app = {
   },
   serialConnectionTimer: null,
   saveData:function(name,data){
-
+    localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
   },
   publishData:function(){
 
