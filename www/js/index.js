@@ -288,7 +288,6 @@ var app = {
     }
   },
   serialDataCallback: function(rawData) {
-    console.log(rawData);
     rawData = rawData.replace(/(\r\n|\n|\r)/gm, "");
     app.paramsDeviceConnected = true;
     if (rawData[0] == "a" && rawData.length == 1) {
@@ -330,6 +329,7 @@ var app = {
   handleMQTTCallback:function(topic, payload) {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
+    aler(payload);
     localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
     if (app.externalDeviceTopics.includes(topic) && networkState != Connection.NONE && networkState != Connection.UNKNOWN) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
