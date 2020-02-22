@@ -389,7 +389,7 @@ var app = {
   },
   serialConnectionTimer: null,
   saveData: function(name, data) {
-    if (name = 'paramData') {
+    if (name = 'paramData' && data[0].length > 1) {
       var sql = "";
       if (!parseInt(data[1])){
        sql += "INSERT INTO parameters (session_id, packet_id, insert_date,";// + data[0] + "=" + data[7] + "='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
