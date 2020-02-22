@@ -23,6 +23,7 @@ var app = {
   serialReg: "",
   paramsDeviceConnected: false,
   externalDeviceTopics: new Array(),
+  database:null,
   // Application Constructor
   initialize: function() {
 
@@ -45,6 +46,7 @@ var app = {
     this.session_initiated = false;
     this.serialReg = "";
     this.externalDeviceTopics = new Array();
+    this.database = null;
     if (localStorage.getItem('session_id') !== undefined) this.session_id = localStorage.getItem('session_id');
     else this.session_id = "test";
 
@@ -60,11 +62,13 @@ var app = {
     cordova.plugins.backgroundMode.on('activate', function() {
       cordova.plugins.backgroundMode.disableWebViewOptimizations();
     });
+    app.database = openDatabase('sten', '1.0', 'lightDeviceTherapy', 8 * 1024 * 1024);
+    app.database.transaction(function (tx) {
+       tx.executeSql('CREATE TABLE parameters ( param_id INTEGER PRIMARY KEY, param1 float, param2 float, param3 float, param4 float, param5 float, param6 float, param7 float, param8 float, param9 float, param10 float, param11 float, param12 float, param13 float, param14 float, param15 float, param16 float, param17 float, param18 float, param19 float, param20 float, insert_date DATETIME, session_id VARCHAR(255) NOT NULL, packet_id INTEGER )',[], function(){},function(tx,error){console.error(error);} );
+    });
     //app.connectToMqttServer();
     app.startSerial();
-
   },
-
   initButtons: function(id) {
     $("button[name='start_stop']").on("click", function() {
       if (app.view != 1 || ((app.bleConnected || !app.bleNecessity) && app.paramsDeviceConnected)) {
@@ -377,7 +381,20 @@ var app = {
   },
   serialConnectionTimer: null,
   saveData:function(name,data){
-    localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
+    if(name='paramData'){
+      var sql = "";
+      if (!parseInt(data[1])) sql += "INSERT INTO parameters SET session_id=" + data[0] + ", packet_id=" + data[7] + ", insert_date='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
+      else sql += "UPDATE parameters SET ";
+      for (var i = 0; i < data.length - 3; i++) {
+        sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1) + "='" + data[2 + i] + "'";
+        if (i < data.length - 4) sql += ",";
+      }
+      if (parseInt(data[1]) != 0) sql += " WHERE session_id=" + data[0] + " AND packet_id=" + data[7];
+      console.log("SQL QUERY : "+sql);
+      app.database.transaction(function (tx) {
+         tx.executeSql(sql);
+      });
+    }
   },
   publishData:function(){
 
