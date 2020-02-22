@@ -398,7 +398,7 @@ var app = {
          if (i < data.length - 4) sql += ",";
          else sql += ")";
        }
-       sql += " ("+data[0] + "," + data[7] + "," + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + ",";
+       sql += " ('"+data[0] + "'," + data[7] + ",'" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
 
        for (var i = 0; i < data.length - 3; i++) {
          sql += data[2 + i] ;
@@ -412,7 +412,7 @@ var app = {
           sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1) + "='" + data[2 + i] + "'";
           if (i < data.length - 4) sql += ",";
         }
-        sql += " WHERE session_id=" + data[0] + " AND packet_id=" + data[7];
+        sql += " WHERE session_id='" + data[0] + "' AND packet_id=" + data[7];
       }
       console.log("SQL QUERY : " + sql);
       app.database.transaction(function(tx) {
