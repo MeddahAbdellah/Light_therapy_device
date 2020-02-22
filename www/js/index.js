@@ -60,7 +60,7 @@ var app = {
     cordova.plugins.backgroundMode.on('activate', function() {
       cordova.plugins.backgroundMode.disableWebViewOptimizations();
     });
-    app.connectToMqttServer();
+    //app.connectToMqttServer();
     app.startSerial();
 
   },
@@ -197,7 +197,7 @@ var app = {
       app.writeToESP("status" + app.device_id, "a,0," + (app.bleConnected ? 1 : 0) + "," + app.device_id);
     });
     mqttClient.on("message", app.handleMQTTCallback);
-    if(networkState != Connection.NONE && networkState != Connection.UNKNOWN)mqttClient.publish("getSettings", "s," + app.device_id);
+    if(app.mqttConnected)mqttClient.publish("getSettings", "s," + app.device_id);
     else app.writeToESP("settings"+app.device_id+"-"+app.high_intensity+","+app.normal_intensity+","+app.low_intensity+","+app.start_timeout+"*");
   },
   timer: setInterval(function() {
@@ -308,8 +308,8 @@ var app = {
         mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
-        alert(networkState != Connection.NONE && networkState != Connection.UNKNOWN);
-        if(networkState != Connection.NONE && networkState != Connection.UNKNOWN)mqttClient.publish(data[1], data[2]);
+        alert(app.mqttConnected);
+        if(app.mqttConnected)mqttClient.publish(data[1], data[2]);
         else app.handleMQTTCallback(data[1],data[2]);
       }
     }
@@ -323,7 +323,7 @@ var app = {
   },
   writeToESP:function(topic,data){
     //CLIP
-    /*if(networkState != Connection.NONE && networkState != Connection.UNKNOWN) mqttClient.publish(topic, data);
+    /*if(app.mqttConnected) mqttClient.publish(topic, data);
     else*/ app.writeSerial(topic + "-" + data + "*");
   },
   handleMQTTCallback:function(topic, payload) {
@@ -331,7 +331,7 @@ var app = {
     var data = payload.toString().split(",");
     aler(payload);
     localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
-    if (app.externalDeviceTopics.includes(topic) && networkState != Connection.NONE && networkState != Connection.UNKNOWN) {
+    if (app.externalDeviceTopics.includes(topic) && app.mqttConnected) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
     }
     if (topic === "newSession" + device_id) {
