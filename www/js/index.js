@@ -308,7 +308,6 @@ var app = {
         if(app.mqttConnected)mqttClient.subscribe(data[1]);
         if (!app.externalDeviceTopics.includes(data[1])) app.externalDeviceTopics.push(data[1]);
       } else if (data[0] == 'p') {
-        alert(app.mqttConnected);
         if(app.mqttConnected)mqttClient.publish(data[1], data[2]);
         else app.handleMQTTCallback(data[1],data[2]);
       }
