@@ -76,10 +76,11 @@ var app = {
         if (!app.sendEnabled) {
           if ((app.bleConnected || !app.bleNecessity) && app.mqttConnected && app.paramsDeviceConnected) {
             if (!app.session_initiated) {
-              app.writeToESP("init" + app.device_id, app.mode + ",");
+              app.writeToESP("init" + app.device_id, app.mode + ",");//CLIP
               app.session_initiated = true;
             } else {
               app.writeToESP("command" + app.device_id, "0,");
+              ////STOP
             }
             //  console.log(app.pad(parseInt(app.start_timeout / 60),2)+":"+app.pad(app.start_timeout % 60,2));
             //  $("#timer").text(app.pad(parseInt((parseInt(app.start_timeout)+1) / 60),2)+":"+app.pad((parseInt(app.start_timeout)+1) % 60,2));
@@ -322,13 +323,14 @@ var app = {
     });
   },
   writeToESP:function(topic,data){
-    if(networkState != Connection.NONE && networkState != Connection.UNKNOWN) mqttClient.publish(topic, data);
-    else app.writeSerial(topic + "-" + data + "*");
+    //CLIP
+    /*if(networkState != Connection.NONE && networkState != Connection.UNKNOWN) mqttClient.publish(topic, data);
+    else*/ app.writeSerial(topic + "-" + data + "*");
   },
   handleMQTTCallback:function(topic, payload) {
     var device_id = app.device_id;
     var data = payload.toString().split(",");
-    console.log(data);
+    localStorage.setItem('log',"||||"+localStorage.getItem('log')+"||||"+data);
     if (app.externalDeviceTopics.includes(topic) && networkState != Connection.NONE && networkState != Connection.UNKNOWN) {
       app.writeSerial(topic + "-" + payload.toString() + "*");
     }
