@@ -392,13 +392,13 @@ var app = {
     if (name = 'paramData') {
       var sql = "";
       if (!parseInt(data[1])){
-       sql += "INSERT INTO parameters VALUES (session_id, packet_id, insert_date,";// + data[0] + "=" + data[7] + "='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
+       sql += "INSERT INTO parameters (session_id, packet_id, insert_date,";// + data[0] + "=" + data[7] + "='" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
        for (var i = 0; i < data.length - 3; i++) {
          sql += " param" + parseInt(data[1] * (data.length - 3) + i + 1);
          if (i < data.length - 4) sql += ",";
          else sql += ")";
        }
-       sql += " ('"+data[0] + "'," + data[7] + ",'" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
+       sql += " VALUES ('"+data[0] + "'," + data[7] + ",'" + moment().tz("Europe/Tallinn").format('YYYY-MM-DD h:mm:ss') + "',";
 
        for (var i = 0; i < data.length - 3; i++) {
          sql += data[2 + i] ;
