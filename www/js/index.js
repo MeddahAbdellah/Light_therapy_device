@@ -452,7 +452,7 @@ var app = {
         $.ajax({
           url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertParams',
           type:'POST',
-          data:results.rows,
+          data:JSON.stringify(results.rows),
           success:function(){
             console.log("SENT PARAMS");
           },
@@ -466,7 +466,7 @@ var app = {
         $.ajax({
           url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertHrData',
           type:'POST',
-          data:results.rows,
+          data:JSON.stringify(results.rows),
           success:function(){
             console.log("SENT HR DATA");
           },
