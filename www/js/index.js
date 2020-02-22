@@ -67,14 +67,14 @@ var app = {
 
   initButtons: function(id) {
     $("button[name='start_stop']").on("click", function() {
-      if (app.view != 1 || ((app.bleConnected || !app.bleNecessity) && app.mqttConnected && app.paramsDeviceConnected)) {
+      if (app.view != 1 || ((app.bleConnected || !app.bleNecessity) && app.paramsDeviceConnected)) {
         var view = app.view == 1 ? app.view + 1 : 1;
         app.view = view;
         app.loadView(view).then(app.initCssStates).then(app.initButtons);
       }
       setTimeout(function() {
         if (!app.sendEnabled) {
-          if ((app.bleConnected || !app.bleNecessity) && app.mqttConnected && app.paramsDeviceConnected) {
+          if ((app.bleConnected || !app.bleNecessity) && app.paramsDeviceConnected) {
             if (!app.session_initiated) {
               app.writeToESP("init" + app.device_id, app.mode + ",");//CLIP
               app.session_initiated = true;
