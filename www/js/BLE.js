@@ -47,10 +47,10 @@ function startBLE(button) {
           while (offset < len) {
             var rrValue = parseInt((pData[offset] & 0xFF) + ((pData[offset + 1] & 0xFF) << 8));
             offset += 2;
-            console.log("leastReading: " + lastReadingTime);
-            console.log("Now: " + new Date().getTime());
+            //console.log("leastReading: " + lastReadingTime);
+            //console.log("Now: " + new Date().getTime());
             var timeDiff = new Date().getTime() - lastReadingTime;
-            console.log("timeDiff: " + timeDiff);
+            //console.log("timeDiff: " + timeDiff);
             //Send data to server
             if (app.sendEnabled) {
               var load = rrValue + "," + timeDiff + "," + app.session_id + "," + hrValue;

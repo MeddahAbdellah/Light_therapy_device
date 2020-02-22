@@ -71,6 +71,13 @@ var app = {
       }, function(tx, error) {
         console.error(error);
       });
+      tx.executeSql('CREATE TABLE IF NOT EXISTS data ( data_id INTEGER PRIMARY KEY, logging_date DATETIME, session_id VARCHAR(255) NOT NULL, hr_val INTEGER  DEFAULT 70,rr_val INTEGER  DEFAULT 0,time_interval INTEGER  DEFAULT 1)', [], function(tx, result) {
+        tx.executeSql('SELECT * FROM data', [], function(tx, results) {
+          console.log(results);
+        }, null);
+      }, function(tx, error) {
+        console.error(error);
+      });
     });
 
     //app.connectToMqttServer();
@@ -226,6 +233,7 @@ var app = {
     } else if (timestamp <= 0) {
       $("#timer").text("00:00");
       app.writeToESP("command" + app.device_id, "0,");
+      app.handleMQTTCallback("command" + app.device_id, "0,");
     }
 
   }, 1000),
@@ -369,6 +377,7 @@ var app = {
         app.session_initiated = false;
         app.loadView(1).then(app.initCssStates).then(app.initButtons);
         $("#timer").text("00:00");
+        app.publishData();
       }
     } else if (topic === "settings" + device_id) {
       app.high_intensity = parseFloat(data[0]) / 10;
@@ -414,6 +423,18 @@ var app = {
         }
         sql += " WHERE session_id='" + data[0] + "' AND packet_id=" + data[7];
       }
+      app.database.transaction(function(tx) {
+        tx.executeSql(sql, [], function(tx, results) {
+          console.log(results);
+        }, function(tx, error) {
+          console.error(error);
+        });
+      });
+    }
+    else if(name == "hrmData"){
+      data = data.split(',');
+      var sql = "INSERT INTO data (rr_val,time_interval,session_id,hr_val) VALUES";
+      sql += "("+data[0]+","+data[1]+",'"+data[2]+"',"+data[3]+")";
       console.log("SQL QUERY : " + sql);
       app.database.transaction(function(tx) {
         tx.executeSql(sql, [], function(tx, results) {
@@ -425,7 +446,36 @@ var app = {
     }
   },
   publishData: function() {
-
+    app.database.transaction(function(tx) {
+      tx.executeSql('SELECT * FROM parameters', [], function(tx, results) {
+        console.log(results);
+        $.ajax({
+          url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertParams',
+          type:'POST',
+          data:results.rows,
+          success:function(){
+            console.log("SENT PARAMS");
+          },
+          error:function(){
+            console.error("PARAM SENDING ERROR");
+          }
+        });
+      }, null);
+      tx.executeSql('SELECT * FROM data', [], function(tx, results) {
+        console.log(results);
+        $.ajax({
+          url:'ec2-13-48-47-167.eu-north-1.compute.amazonaws.com/insertHrData',
+          type:'POST',
+          data:results.rows,
+          success:function(){
+            console.log("SENT HR DATA");
+          },
+          error:function(){
+            console.error("HR DATA SENDING ERROR");
+          }
+        });
+      }, null);
+    });
   }
 
 };
