@@ -177,7 +177,7 @@ var app = {
     },
 
     connectToMqttServer:function(){
-      mqttClient = mqtt.connect("ws://13.48.47.167:9000",{clientId:"APP"+app.device_id});
+      mqttClient = mqtt.connect("ws://13.48.137.179:9000",{clientId:"APP"+app.device_id});
       console.log("MQTT Connected");
       mqttClient.subscribe("command"+app.device_id);
       mqttClient.subscribe("settings"+app.device_id);
